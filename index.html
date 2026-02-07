@@ -44,7 +44,7 @@
 
       client.connect();
 
-      client.on("message", async (e) => {
+      client.on("message", (e) => {
         const { channel, user, message } = e;
         console.log(`[${channel.login}] ${user.login}: ${message.text}`);
         if (
@@ -56,28 +56,30 @@
         ) {
           const img = document.createElement("img");
           img.src = message.text;
-          document.body.appendChild(img);
-          const animation = img.animate(
-            [
+          img.onload = () => {
+            document.body.appendChild(img);
+            const animation = img.animate(
+              [
+                {
+                  opacity: "0",
+                },
+                {
+                  opacity: "1",
+                },
+                {
+                  opacity: "0",
+                },
+              ],
               {
-                opacity: "0",
+                duration: time * 1000,
+                iterations: 1,
+                easing: "cubic-bezier(0,.9,1,.1)",
               },
-              {
-                opacity: "1",
-              },
-              {
-                opacity: "0",
-              },
-            ],
-            {
-              duration: time * 1000,
-              iterations: 1,
-              easing: "cubic-bezier(0,.9,1,.1)",
-            },
-          );
+            );
 
-          animation.onfinish = () => {
-            img.remove();
+            animation.onfinish = () => {
+              img.remove();
+            };
           };
         }
       });
