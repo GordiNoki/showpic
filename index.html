@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tmi.js/chat@0.7.4/dist/tmi.browser-global.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const channel = params.get("channel");
+      let time = Number(params.get("time"));
+      if (isNaN(time)) time = 5;
+
+      if (!channel) {
+        const message = document.createElement("h1");
+        message.textContent = "Set channel param";
+        document.body.appendChild(message);
+        throw new Error("Set channel param");
+      }
+
+      const client = new tmi.Client({
+        channels: [channel],
+        username: "justinfan12345",
+        password: "meow",
+      });
+
+      client.connect();
+
+      client.on("message", async (e) => {
+        const { channel, user, message } = e;
+        console.log(`[${channel.login}] ${user.login}: ${message.text}`);
+        if (
+          user.login == "nightbot" &&
+          message.text.startsWith("https://") &&
+          (message.text.endsWith(".jpg") ||
+            message.text.endsWith(".png") ||
+            message.text.endsWith(".webp"))
+        ) {
+          const img = document.createElement("img");
+          img.src = message.text;
+          document.body.appendChild(img);
+          const animation = img.animate(
+            [
+              {
+                opacity: "0",
+              },
+              {
+                opacity: "1",
+              },
+              {
+                opacity: "0",
+              },
+            ],
+            {
+              duration: time * 1000,
+              iterations: 1,
+              easing: "cubic-bezier(0,.9,1,.1)",
+            },
+          );
+
+          animation.onfinish = () => {
+            img.remove();
+          };
+        }
+      });
+
+      window.test = () => {
+        client.emit("message", {
+          channel: { login: "test" },
+          user: { login: "nightbot" },
+          message: { text: "https://cdn2.thecatapi.com/images/af9.jpg" },
+        });
+      };
+    </script>
+  </body>
+</html>
