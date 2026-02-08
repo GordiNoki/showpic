@@ -51,8 +51,10 @@
           user.login == "nightbot" &&
           message.text.startsWith("https://") &&
           (message.text.endsWith(".jpg") ||
+            message.text.endsWith(".jpeg") ||
             message.text.endsWith(".png") ||
-            message.text.endsWith(".webp"))
+            message.text.endsWith(".webp") ||
+            message.text.endsWith(".gif"))
         ) {
           const img = document.createElement("img");
           img.src = message.text;
